@@ -48,12 +48,14 @@ while True:
   accx = read_word_2c(0x3b)
   accy = read_word_2c(0x3d)
   accz = read_word_2c(0x3f)
+
+  #TODO: not sure about scaling these, based on an example in german 
   print ("gyro x:{0:3f} y:{1:3f} z: {2:3f} acc x:{3:3f} y:{4:3f} z:{5:3f}".format(gyrox/131, gyroy/131, gyroz/131, accx, accy, accz), end='\r')
-  #print ("acc x:{0:3f} y:{1:3f} z:{2:3f}".format(accx/16384.0, accy/16384.0, accz/16384.0), end='\r')
- 
   xskalier = accx / 16384.0
   yskalier = accy / 16384.0
-  zskalier = accz / 16384.0
+  zskalier = accz / 16384.0 
+  #print ("acc x:{0:3f} y:{1:3f} z:{2:3f}".format(accx/16384.0, accy/16384.0, accz/16384.0), end='\r')
+ 
   time.sleep(1)  
  
  
