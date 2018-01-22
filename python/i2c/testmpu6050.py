@@ -1,0 +1,59 @@
+#!/usr/bin/python
+import smbus
+import math
+import time
+ 
+# Register
+power_mgmt_1 = 0x6b
+power_mgmt_2 = 0x6c
+ 
+def read_byte(reg):
+    return bus.read_byte_data(address, reg)
+ 
+def read_word(reg):
+    h = bus.read_byte_data(address, reg)
+    l = bus.read_byte_data(address, reg+1)
+    value = (h << 8) + l
+    return value
+ 
+def read_word_2c(reg):
+    val = read_word(reg)
+    if (val >= 0x8000):
+        return -((65535 - val) + 1)
+    else:
+        return val
+ 
+def dist(a,b):
+    return math.sqrt((a*a)+(b*b))
+ 
+def get_y_rotation(x,y,z):
+    radians = math.atan2(x, dist(y,z))
+    return -math.degrees(radians)
+ 
+def get_x_rotation(x,y,z):
+    radians = math.atan2(y, dist(x,z))
+    return math.degrees(radians)
+ 
+bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
+address = 0x68       # via i2cdetect
+ 
+bus.write_byte_data(address, power_mgmt_1, 0)
+ 
+ 
+while True:
+  gyrox = read_word_2c(0x43)
+  gyroy = read_word_2c(0x45)
+  gyroz = read_word_2c(0x47)
+ 
+  accx = read_word_2c(0x3b)
+  accy = read_word_2c(0x3d)
+  accz = read_word_2c(0x3f)
+  print ("gyro x:{0:3f} y:{1:3f} z: {2:3f} acc x:{3:3f} y:{4:3f} z:{5:3f}".format(gyrox/131, gyroy/131, gyroz/131, accx, accy, accz), end='\r')
+  #print ("acc x:{0:3f} y:{1:3f} z:{2:3f}".format(accx/16384.0, accy/16384.0, accz/16384.0), end='\r')
+ 
+  xskalier = accx / 16384.0
+  yskalier = accy / 16384.0
+  zskalier = accz / 16384.0
+  time.sleep(1)  
+ 
+ 
